@@ -6,20 +6,6 @@ It demonstrates practical practices in building scalable systems such as message
 
 ---
 
-## Table of Contents
-
-1. [Overview](#overview)
-2. [System Architecture](#system-architecture)
-3. [Components](#components)
-4. [Installation and Configuration](#installation-and-configuration)
-5. [Running the System](#running-the-system)
-6. [Load Testing](#load-testing)
-7. [Environment Variables](#environment-variables)
-8. [Message Flow](#message-flow)
-9. [Best Practices and Applications](#best-practices-and-applications)
-
----
-
 ## Overview
 
 The system is designed to:
@@ -96,7 +82,14 @@ git clone <repo_url>
 cd <repo>
 ```
 
-2. Create a `.env` file with environment variables:
+2. Install Node.js dependencies:
+```bash
+npm install
+```
+
+3. Make sure you have Docker installed if you want to run RabbitMQ locally. You need a running RabbitMQ instance for the API and workers.
+
+4. Create a `.env` file with environment variables:
 ```
 RABBITMQ_HOST=localhost
 RABBITMQ_PORT=5672
@@ -110,47 +103,66 @@ PREFETCH=10
 LOG_LEVEL=info
 ```
 
-3. Start containers:
+5. Start containers:
 ```bash
 docker-compose up --build -d
 ```
+
+When using `npm run start-all`, if Docker is installed and RabbitMQ is not running, the command will automatically start RabbitMQ using Docker.
 
 Environment-based configuration allows the same codebase to run in development, staging, and production without modification.
 
 ---
 
-## Running the System
+## Running and Testing the API
 
-1. Start API and Worker using PM2:
+### Single-Core Mode (Single Instance)
+
+This mode runs only one instance of the API and worker, useful for development, debugging, or small-scale testing.
+
+**Steps:**
+
+1. Start API and worker in single-core mode:
 ```bash
-npm install -g pm2
-npm install
-npm run start
-pm2 start pm2.config.cjs
+npm run start-all
 ```
 
-2. Check status:
-```bash
-pm2 list
-```
-
-Continuous monitoring and clustering via PM2 ensure uptime and reliability in production environments.
-
----
-
-## Load Testing
-
-1. Install Artillery:
-```bash
-npm install -g artillery
-```
-
-2. Run the test:
+2. Run load testing:
 ```bash
 artillery run load-test.yml
 ```
 
-Stress testing helps identify bottlenecks before production traffic spikes, reducing downtime and failures.
+- Simulates high request volume to the `/enqueue` endpoint.
+- Useful to see how a single instance handles concurrent requests.
+
+### Multi-Core Mode (Cluster Mode)
+
+This mode runs multiple instances of the API and worker using PM2, taking advantage of all available CPU cores. Ideal for high-load production testing.
+
+**Steps:**
+
+1. Start API and worker with PM2 cluster mode:
+```bash
+pm2 start pm2.config.cjs
+```
+
+2. Monitor processes and resource usage:
+```bash
+pm2 monit
+```
+
+3. Run load testing:
+```bash
+artillery run load-test.yml
+```
+
+- Validates system performance under high concurrency.
+- Ensures horizontal scalability and resilience.
+
+Notes:
+- `artillery run load-test.yml` works in both single-core and multi-core setups.
+- Single-core tests are for functionality checks, multi-core tests are for performance and scalability validation.
+- Use `pm2 logs` during multi-core tests to debug or identify bottlenecks.
 
 ---
 
@@ -192,9 +204,4 @@ This decoupled architecture allows APIs to remain responsive while heavy process
 - Structured Logging with Pino enables monitoring, debugging, and analytics.
 - Load Testing with Artillery validates system behavior under peak loads.
 
-These practices are essential for production-grade applications like social media platforms, e-commerce order pipelines, banking systems, and messaging applications.
-
 ---
-
-**Author:** Engineering Team
-**Date:** 2025-12-01
