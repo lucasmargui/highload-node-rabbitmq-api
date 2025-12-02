@@ -4,6 +4,10 @@ This project implements a high-performance architecture for asynchronous message
 
 It demonstrates practical practices in building scalable systems such as message queuing, load balancing, and fault-tolerant workers.
 
+
+<img width="1305" height="515" alt="image" src="https://github.com/user-attachments/assets/ecadf7bf-d0fd-4e4f-b377-83b203f26456" />
+
+
 ---
 
 ## Overview
