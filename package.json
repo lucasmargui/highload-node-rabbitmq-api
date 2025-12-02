@@ -1,0 +1,33 @@
+{
+  "name": "api-highload",
+  "version": "1.0.0",
+  "description": "High performance Node.js API using Fastify + PM2 cluster mode",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "worker": "node worker.js",
+    "rabbit": "docker start rabbitmq 2> NUL || docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management",
+    "start": "pm2 start pm2.config.cjs --env production",
+    "restart": "pm2 restart api-highload",
+    "stop": "pm2 stop api-highload",
+    "logs": "pm2 logs",
+    "start-all": "npm-run-all rabbit --parallel dev worker"
+  },
+  "dependencies": {
+    "@fastify/helmet": "^13.0.2",
+    "@fastify/rate-limit": "^10.3.0",
+    "amqplib": "^0.10.9",
+    "dotenv": "^17.2.3",
+    "fastify": "^5.6.2",
+    "fastify-rate-limit": "^5.8.0",
+    "npm-run-all": "^4.1.5",
+    "pino": "^9.0.0"
+  },
+  "devDependencies": {
+    "pm2": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18 <=22"
+  }
+}

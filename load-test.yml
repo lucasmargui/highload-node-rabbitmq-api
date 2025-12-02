@@ -1,0 +1,25 @@
+config:
+  target: "http://localhost:3001"
+  phases:
+    - duration: 30
+      arrivalRate: 1000       # 1000 req/s
+      rampTo: 5000            # sobe até 5000 req/s
+      name: "Ramp-up high load"
+    - duration: 60
+      arrivalRate: 5000       # mantém 5000 req/s por 1 minuto
+      name: "Sustained load"
+
+  http:
+    timeout: 5000
+    pool: 500                 # mantem conexões keep-alive
+
+scenarios:
+  - name: "Enviar mensagem para /enqueue"
+    flow:
+      - post:
+          url: "/enqueue"
+          json:
+            phone: "+5511999999999"
+            message: "Olá, esta é uma mensagem de teste"
+            meta:
+              source: "artillery_test"
